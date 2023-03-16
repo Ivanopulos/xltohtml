@@ -1,16 +1,17 @@
+# для нарезки хтмл-ок по шаблону в эксельке, один столбец- один файл рождается
 import pandas  # +openpyxl
 import copy
 df = pandas.read_excel("1.xlsx", header=None)
-df.iloc[0] = df.iloc[0].str.replace(r'\.(?!h)', "", regex=True)
-df.iloc[0] = df.iloc[0].str.replace(r'[,/\\\?\!]', "", regex=True)
+#df.iloc[0] = df.iloc[0].str.replace(r'\.(?!h)', "", regex=True)
+#df.iloc[0] = df.iloc[0].str.replace(r'[,/\\\?\!]', "", regex=True)
 df.iloc[0] = df.iloc[0].str.lower()
 df.columns = df.iloc[0]
-df = df.fillna("-")
+#df = df.fillna("-")
 print(df.columns.values[1])
 colcount = df.count(axis='columns')[0]   # один столбец под разметку один под названия
 with open("1.html", 'r', encoding='utf-8') as f:  # save before chenge
     get_all2 = f.readlines()
-for fl in range(2, colcount):
+for fl in range(2, colcount):  # перебор столбцов и нарезка их на файлы
     nstolb = df.columns.values[fl]
     print(nstolb)
     mem = 0
@@ -27,9 +28,14 @@ for fl in range(2, colcount):
                 found = get_all[isch][usch] + found
             if get_all[isch][usch] == "{":
                 mem = 0
-                tx = df[df["{0}"] == found][nstolb].values[0]  # header=False,
+                try:
+                    tx = df[df["{0}"] == found][nstolb].values[0]  # header=False, # ловим глюк разметки - несуществующие строки
+                except:
+                    print(found)
+                    tx = df[df["{0}"] == found][nstolb].values[0]  # header=False,
                 try:
                     float(tx)
+                    tx = round(tx, 2)
                     tx = str(tx).replace(".", ",")
                 except:
                     asd = 0
