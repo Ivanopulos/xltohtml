@@ -59,9 +59,16 @@ for fl in range(3, colcount+1):  # перебор столбцов и нарез
                     print(found)
                     tx = df[df["{0}"] == found][nstolb].values[0]  # header=False,
                 try:
-                    float(tx)
-                    tx = round(tx, 2)
-                    tx = str(tx).replace(".", ",")
+                    # check if tx is NaN
+                    if pandas.isna(tx):
+                        tx = ""
+                    # check if tx is a date
+                    elif pandas.to_datetime(tx, errors='coerce') is not pandas.NaT:
+                        tx = pandas.to_datetime(tx).strftime("%d.%m.%Y")
+                    else:
+                        float(tx)
+                        tx = round(tx, 2)
+                        tx = str(tx).replace(".", ",")
                 except:
                     asd = 0
                 try:
