@@ -1,5 +1,8 @@
 import pandas  # +openpyxl
 import copy
+import os
+from datetime import datetime
+import re
 df = pandas.read_excel("1.xlsm", header=None)
 df.iloc[0] = df.iloc[0].str.lower()  # хз зачем но очень нада
 df.columns = df.iloc[0]
@@ -35,9 +38,13 @@ print(df.columns.values[1])
 colcount = df.count(axis='columns')[0]  # &&
 with open("1.html", 'r', encoding='utf-8') as f:  # save before chenge
     get_all2 = f.readlines()
+flnm = str(datetime.now().date()) + " " + re.sub(r'[^\w ]', r'', df.iloc[2][3])[:12]  # для файла куда все складываем
+if not os.path.exists(flnm):
+    os.makedirs(flnm)
+print(flnm)
 for fl in range(3, colcount+1):  # перебор столбцов и нарезка их на файлы
     nstolb = df.columns.values[fl]
-    print(nstolb)
+    print(nstolb,1)
     mem = 0
     isch = 0
     usch = 0
@@ -55,7 +62,7 @@ for fl in range(3, colcount+1):  # перебор столбцов и нарез
                 try:
                     tx = df[df["{0}"] == found][nstolb].values[0]  # header=False, # ловим глюк разметки - несуществующие строки
                 except:
-                    print(found)
+                    print(found, 2)
                     tx = df[df["{0}"] == found][nstolb].values[0]  # header=False,
                 try:
                     # check if tx is NaN
@@ -74,13 +81,13 @@ for fl in range(3, colcount+1):  # перебор столбцов и нарез
                     get_all[isch] = get_all[isch][:usch] + str(tx) + get_all[isch][usch + len(found):]
                 except:
                     print(tx)
-                    print(found)
+                    print(found, 3)
                     get_all[isch] = get_all[isch][:usch] + str(tx) + get_all[isch][usch + len(found):]
                 found = ""
             usch = usch - 1
         isch = isch + 1
     #/n делит одноименных б
-    my_file = open("/home/" + df.iloc[0][fl], "w",  encoding="utf-8")
+    my_file = open(flnm + "/" + df.iloc[0][fl], "w",  encoding="utf-8")
     my_file.writelines(get_all)
     my_file.close()
 print("FINISH")
